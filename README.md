@@ -1,35 +1,76 @@
+<div align="center">
+
 # Jet Engine Playground
 
-Explore the inside of a turbofan engine: follow the airflow, trace the shafts, and see how its sections work together.
+### Follow the air. Hear the spools. Explore the engine.
 
-**[Open the live simulator](https://jet-engine-playground.vercel.app/)** · [GitHub repository](https://github.com/aaravrizzy/jet-engine-playground)
+An interactive turbofan learning lab built with **React · TypeScript · Vite · SVG · Web Audio**.
 
-Built with **React, TypeScript, Vite and original SVG animations**. Hosted on Vercel. The simulator runs in your browser with no account, backend or API keys.
+**[Launch the simulator](https://jet-engine-playground.vercel.app/)** &nbsp; · &nbsp; [Quick start](#run-it-yourself) &nbsp; · &nbsp; [Explore the engines](#two-engines-two-architectures) &nbsp; · &nbsp; [Technical guide](docs/GUIDE.md)
 
-## Engines you can explore
+**No account · No API keys · Runs in your browser**
 
-| Engine | Representative variant | Aircraft application | Architecture |
-| --- | --- | --- | --- |
-| Rolls-Royce Trent XWB | Trent XWB-84 | Airbus A350-900 | Three spools: LP, IP and HP |
-| GE Aerospace GEnx-1B | GEnx-1B70 | Boeing 787-8 | Two spools: LP and HP |
+[![Jet Engine Playground running the Trent XWB simulator, showing the cutaway, shaft connections and controls](docs/images/simulator-trent.png)](https://jet-engine-playground.vercel.app/)
 
-On the Trent, each turbine drives its corresponding fan or compressor assembly. On the GEnx, the LP turbine drives both the fan and booster; the HP turbine drives the HP compressor. Matching colours identify connected components. See [SOURCES.md](SOURCES.md) for the supporting references.
+*Click the screenshot to open the live simulator. Screenshots show the real application; readings are illustrative.*
 
-## What you can do
+</div>
 
-- **Explore an animated cutaway:** intake, fan, bypass passage, compressors, combustor, turbines, concentric shafts and exhaust paths.
-- **Operate the teaching model:** start, stop, change throttle, pause, slow to quarter speed and reset. Engine changes reset operating state.
-- **Follow the air:** click components or use the five-step guided tour. Toggle airflow, shafts, labels and casing.
-- **Read the instruments:** normalized spool speeds, exhaust heat, fuel flow and thrust respond smoothly to the controls.
-- **Switch temperatures between °C and °F:** the section panel and diagram labels update together. These are explicitly illustrative examples, not measured engine temperatures.
-- **Enable engine-specific sound:** the Trent has a deeper synthesized rumble and an IP-spool tone; the GEnx has a brighter fan tone and airflow hiss. Audio follows spool response and fades during pause or shutdown. No recordings are used.
-- **Compare architectures:** view aircraft applications, mechanical connections, published fan diameters and stage counts with source links.
+## Take the controls
 
-All engine sections operate continuously together while running. The guided tour is a teaching sequence, not an engine startup sequence.
+Open the **[live playground](https://jet-engine-playground.vercel.app/)** and try this:
 
-## Run locally
+1. **Start an engine** and slowly raise the throttle. Watch the spools respond at different rates.
+2. **Follow the air** from the intake through compression, combustion, turbines and exhaust.
+3. **Click a component** to highlight its section and understand its job.
+4. **Enable sound**, then switch engines to hear their different synthesized voices.
+5. **Compare the architectures** and trace what each shaft drives.
 
-Use Node.js 22.12+ and npm. This project was developed with Node.js 26.13.1.
+| Explore | What changes |
+| --- | --- |
+| **Engine cutaway** | Metallic blade silhouettes, animated airflow and colour-matched shaft systems |
+| **Operating controls** | Start, stop, throttle, pause, quarter-speed motion and reset |
+| **Diagram layers** | Toggle airflow, shafts, labels and casing |
+| **Temperature view** | Switch between °C and °F across section labels and the heat panel |
+| **Sound** | Engine-specific airflow, rumble and spool tones that respond to operation |
+| **Learning tools** | Five-step guided tour, component explanations and sourced comparisons |
+
+> All engine sections operate continuously together. The tour is a teaching sequence, not an engine startup procedure.
+
+## Two engines, two architectures
+
+| | Rolls-Royce Trent XWB | GE Aerospace GEnx-1B |
+| --- | --- | --- |
+| **Representative variant** | Trent XWB-84 | GEnx-1B70 |
+| **Aircraft** | Airbus A350-900 | Boeing 787-8 |
+| **Spools** | Three: LP, IP and HP | Two: LP and HP |
+| **Key connection** | The IP compressor has its own turbine and shaft | The fan and booster share the LP shaft |
+
+<details>
+<summary><strong>Explore the GEnx cutaway and stage explanations</strong></summary>
+
+![GEnx two-spool cutaway with the turbine learning section selected](docs/images/simulator-genx.png)
+
+The LP turbine powers the fan and booster. The HP turbine powers the HP compressor. Matching shaft colours show these mechanical connections.
+
+[Try it in the simulator](https://jet-engine-playground.vercel.app/)
+
+</details>
+
+<details>
+<summary><strong>See the side-by-side engine comparison</strong></summary>
+
+![Comparison of the Trent XWB-84 and GEnx-1B70, including aircraft, spool connections and sourced specifications](docs/images/comparison.png)
+
+Published specifications are separate from the illustrative simulation. Neither architecture is presented as universally better.
+
+[Read the factual sources](SOURCES.md)
+
+</details>
+
+## Run it yourself
+
+Use **Node.js 22.12+** and npm:
 
 ```sh
 git clone https://github.com/aaravrizzy/jet-engine-playground.git
@@ -38,39 +79,10 @@ npm ci
 npm run dev
 ```
 
-Open the localhost URL printed by Vite, normally `http://127.0.0.1:5173`. Stop the server with `Ctrl+C`. Dependency installation requires internet access; the locally served simulator does not require external services. Source links require internet access.
+Open the localhost URL printed in your terminal. No environment variables or keys are needed.
 
-## Controls and accessibility
-
-Use **Start engine**, then adjust the throttle. Stop lets the spools coast down; restarting returns the command to idle. Reset clears the run, tour and diagram layer choices. Throttle command is not equal to thrust percentage.
-
-Controls support keyboard navigation with Tab, Enter/Space and slider arrow keys. Stage buttons offer an alternative to selecting the SVG. On smaller screens, scroll the enlarged diagram sideways; its scroll region can also receive keyboard focus. Reduced-motion preferences freeze decorative airflow and rotor motion while the readings remain responsive. Sound is off until you enable it.
-
-## Project structure
-
-```text
-src/
-  data/engines.ts                 Engine definitions, verified facts and sources
-  types.ts                       Engine and diagram types
-  simulation/
-    model.ts                     Pure simulation state transitions
-    useSimulation.ts             Frame clock and reduced-motion support
-    thermal.ts                   Illustrative heat profile and unit conversion
-    sound.ts                     Engine-specific synthesized audio profiles
-    useEngineSound.ts            Web Audio lifecycle and smooth sound changes
-  components/
-    EngineCutaway.tsx            Original interactive SVG rendering
-    ThermalProfile.tsx           Section temperatures and unit switch
-  App.tsx                        Controls, learning, gauges and comparison
-  styles.css                     Responsive layout and visual styling
-tests/                           Model, browser and production-policy tests
-scripts/                         Credential-pattern scan and licence notices
-public/                          Original favicon, notices and host header template
-```
-
-Engine data, simulation logic and rendering are kept separate so another researched engine can be added without rebuilding the whole interface.
-
-## Build and checks
+<details>
+<summary><strong>Build, tests and security checks</strong></summary>
 
 ```sh
 npm run build
@@ -81,75 +93,62 @@ npm run security:scan
 npm audit
 ```
 
-`npm run build` type-checks the app and generates `dist/`. `npm run preview` serves that production build locally. After building, check its security policy with:
+After building, check the local production policy:
 
 ```sh
 npx playwright test --config playwright.production.config.ts
 ```
 
-Browser tests use Microsoft Edge. To use Playwright Chromium instead, remove `launchOptions.channel: 'msedge'` from both Playwright configuration files, then run `npx playwright install chromium`. Test screenshots and reports are ignored by Git.
+Browser tests use Microsoft Edge. Alternative browser setup, deployment settings and command explanations are in the [technical guide](docs/GUIDE.md). Recorded checks and their limits are in [VALIDATION.md](VALIDATION.md).
 
-See [VALIDATION.md](VALIDATION.md) for the recorded checks and their limits. Historical local results do not independently verify the current live deployment.
+</details>
 
-## Vercel deployment
+<details>
+<summary><strong>Project structure and adding another engine</strong></summary>
 
-The live application is hosted at **https://jet-engine-playground.vercel.app/**.
-
-| Build setting | Value |
-| --- | --- |
-| Framework | Vite |
-| Root directory | Repository root |
-| Install command | `npm ci` |
-| Build command | `npm run build` |
-| Output directory | `dist` |
-| Environment variables | None required |
-
-To update the repository after making changes:
-
-```sh
-git add .
-git diff --cached
-git commit -m "Describe your changes"
-git push
+```text
+src/
+  data/          Engine definitions, verified facts and source links
+  simulation/    State transitions, temperatures and synthesized audio
+  components/    Interactive SVG cutaway and temperature panel
+  App.tsx        Controls, learning, gauges and comparison
+  styles.css     Responsive interface and focus states
+tests/           Model, browser and production-policy tests
+docs/            Screenshots and technical guide
 ```
 
-Review the staged changes before committing. With Vercel's Git integration configured, pushes to the configured production branch trigger deployment. Check the Vercel dashboard for the build result.
+Data, simulation and rendering are separate. See [Add another engine](docs/GUIDE.md#add-another-engine) for the research requirements, schema and validation steps.
 
-The `public/_headers` file is a template for compatible static hosts; do not assume Vercel applies it. Configure equivalent response headers through Vercel's project configuration and verify them on the live URL. This checkout currently has no `vercel.json`; the live header configuration has not been independently checked here.
+</details>
 
-## Accuracy and simulation limits
+<details>
+<summary><strong>Keyboard, mobile and reduced motion</strong></summary>
 
-**Simplified educational schematic — not to scale.**
+Use **Tab** to move between controls, **Enter/Space** to activate buttons and arrow keys to adjust the throttle. The enlarged mobile cutaway scrolls sideways. Stage buttons offer an alternative to selecting the diagram.
 
-The architecture and separately listed specifications come from public sources. Blade silhouettes, spacing, passage shapes, flow proportions and animation speeds are original approximations. Drawn blades do not represent verified blade counts or exact internal geometry. Cooling circuits, bearings, bleed air, accessories, variable stators and control laws are omitted.
+Reduced-motion preferences stop decorative rotor and airflow motion while readings remain responsive. Sound is opt-in.
 
-The main instruments use dimensionless 0–100 teaching indices, not actual percent RPM, fuel rates or thrust. The shared response model uses smooth lag and a nonlinear throttle-to-thrust curve; it is not a thermodynamic solver and cannot rank the engines' real performance.
+</details>
 
-The temperature display uses a deliberately chosen example scale: **20 °C ambient plus 12 °C per heat-index point**. Fahrenheit is converted using `°F = °C × 9/5 + 32` before rounding. These numbers are not manufacturer measurements, operating limits or blade/casing temperatures. The separate exhaust gauge remains a normalized heat index. Startup, shutdown and acoustic profiles are also illustrative.
+## What is real—and what is illustrative?
 
-## Sources, licences and security
+**Researched:** the selected aircraft applications, spool architectures, shaft connections and separately listed published specifications.
 
-- [SOURCES.md](SOURCES.md): engine facts, references and scope limitations.
-- [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md): dependency versions and licence notices.
-- [CONTENT_ORIGINS.md](CONTENT_ORIGINS.md): original code, artwork and audio provenance.
+**Illustrative:** geometry, drawn blade counts, animation speeds, startup/shutdown behaviour, sound and simulated readings. Audio is synthesized, not an authentic engine recording.
 
-No manufacturer logos, photographs, recordings, CAD or third-party engine models are included. Names are factual identifiers; trademarks remain with their respective owners. A public licence for the original project code has not yet been selected. Regenerate dependency notices after dependency changes with `node scripts/notices.mjs`.
+The °C/°F display uses a deliberately chosen teaching scale: **20 °C ambient + 12 °C per heat-index point**. It is not manufacturer temperature data, a validated thermal model or a metal-temperature limit. Main gauges use normalized indices. Do not use the simulation to compare real-world engine performance.
 
-No API keys are required. Never put secrets in frontend code, browser storage or `VITE_*` variables. A future keyed service needs a restricted backend, appropriate access and usage controls, and server-side secret storage.
+| Documentation | What it covers |
+| --- | --- |
+| [Sources](SOURCES.md) | Engineering references and variant-specific claims |
+| [Content origins](CONTENT_ORIGINS.md) | Original diagrams, code and synthesized audio |
+| [Third-party notices](THIRD_PARTY_NOTICES.md) | Dependency licences and preserved notices |
+| [Technical guide](docs/GUIDE.md) | Setup, controls, architecture, security and deployment |
 
-Production builds disable source maps and embed a Content-Security-Policy. Local production preview also sends protective response headers. Only intended public assets are copied into the build. The development server is configured for localhost and is not a production server.
-
-The credential scanner checks workspace/build text and available Git history for common secret patterns without printing secret values. It is a heuristic, not a guarantee. If a credential is exposed, revoke and rotate it; deleting the file alone is insufficient. Dependency audits and local tests do not guarantee that a website is unhackable.
-
-## Add another engine
-
-1. Research a specific variant, aircraft application and shaft connections using manufacturer or regulator sources. Add references to the data catalogue and SOURCES.md.
-2. Add an `Engine` definition in `src/data/engines.ts`, with unique component IDs, stage assignments (0–4), spool membership and turbine-to-driven-component connections.
-3. Position the schematic components in the 1100×440 view. Shafts share the centreline at y=230. Check that core airflow intersects each required assembly and bypass airflow avoids combustion.
-4. Add verified specifications with units and references. The comparison currently uses three matching specification categories; extend its schema if needed.
-5. Add an explicit audio profile if desired. For geared fans, additional spool types or different flow architectures, extend the schema and renderer instead of forcing a direct-drive LP/IP/HP arrangement.
-6. Update the initial two-engine scope test, learning copy and relevant tests. Verify switching, controls, airflow, mobile layout and reduced motion, and inspect the rendered result.
+No manufacturer artwork, logos, recordings or CAD are included. Manufacturer names identify the engines; they do not imply endorsement. No public licence for the original project code has been selected.
 
 ---
 
-Independent educational project. Not affiliated with or endorsed by aircraft or engine manufacturers. Schematics and simulated readings are simplified and are not intended for flight operations, maintenance, engineering design, or certification.
+**Independent educational project.** Not affiliated with or endorsed by aircraft or engine manufacturers. Schematics and simulated readings are simplified and are not intended for flight operations, maintenance, engineering design, or certification.
+
+[Back to top](#jet-engine-playground) · **[Open Jet Engine Playground](https://jet-engine-playground.vercel.app/)**

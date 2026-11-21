@@ -23,3 +23,5 @@ Airflow revision: original converging intake paths and particle streaks. The sec
 Instrument-bench revision: original metallic SVG shading, analog-style teaching gauges and live section heat callouts. The visual finish does not claim engineering geometry, true blade counts or authentic cockpit instruments.
 
 Audio revision: distinct original synthesized profiles for the two engines, combining filtered generated noise with fan harmonics and spool tones. The Trent includes an IP tone; the GEnx has no IP tone. Profile pitches and timbres are creative teaching choices, not researched acoustic signatures. No recordings or other external audio assets are used.
+
+README gallery: screenshots in docs/images are captures of this project's own locally rendered interface, produced with tests/readme/screenshots.spec.ts. They are not manufacturer photographs or generated mockups. Regenerate with npx playwright test --config playwright.readme.config.ts. These documentation assets are kept outside public/ and are not bundled into the website.
