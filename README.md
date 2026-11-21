@@ -1,85 +1,155 @@
 # Jet Engine Playground
 
-An original, local educational turbofan simulator built with React, TypeScript and Vite. No account, backend, API key, analytics, remote fonts or paid service is required. After installation, the app runs without an internet connection; external source links require internet access.
+Explore the inside of a turbofan engine: follow the airflow, trace the shafts, and see how its sections work together.
+
+**[Open the live simulator](https://jet-engine-playground.vercel.app/)** · [GitHub repository](https://github.com/aaravrizzy/jet-engine-playground)
+
+Built with **React, TypeScript, Vite and original SVG animations**. Hosted on Vercel. The simulator runs in your browser with no account, backend or API keys.
+
+## Engines you can explore
+
+| Engine | Representative variant | Aircraft application | Architecture |
+| --- | --- | --- | --- |
+| Rolls-Royce Trent XWB | Trent XWB-84 | Airbus A350-900 | Three spools: LP, IP and HP |
+| GE Aerospace GEnx-1B | GEnx-1B70 | Boeing 787-8 | Two spools: LP and HP |
+
+On the Trent, each turbine drives its corresponding fan or compressor assembly. On the GEnx, the LP turbine drives both the fan and booster; the HP turbine drives the HP compressor. Matching colours identify connected components. See [SOURCES.md](SOURCES.md) for the supporting references.
+
+## What you can do
+
+- **Explore an animated cutaway:** intake, fan, bypass passage, compressors, combustor, turbines, concentric shafts and exhaust paths.
+- **Operate the teaching model:** start, stop, change throttle, pause, slow to quarter speed and reset. Engine changes reset operating state.
+- **Follow the air:** click components or use the five-step guided tour. Toggle airflow, shafts, labels and casing.
+- **Read the instruments:** normalized spool speeds, exhaust heat, fuel flow and thrust respond smoothly to the controls.
+- **Switch temperatures between °C and °F:** the section panel and diagram labels update together. These are explicitly illustrative examples, not measured engine temperatures.
+- **Enable engine-specific sound:** the Trent has a deeper synthesized rumble and an IP-spool tone; the GEnx has a brighter fan tone and airflow hiss. Audio follows spool response and fades during pause or shutdown. No recordings are used.
+- **Compare architectures:** view aircraft applications, mechanical connections, published fan diameters and stage counts with source links.
+
+All engine sections operate continuously together while running. The guided tour is a teaching sequence, not an engine startup sequence.
 
 ## Run locally
 
-Install a supported Node.js version (Node 22.12+; tested here on Node 26.13.1) and npm. From this folder:
+Use Node.js 22.12+ and npm. This project was developed with Node.js 26.13.1.
 
-```powershell
+```sh
+git clone https://github.com/aaravrizzy/jet-engine-playground.git
+cd jet-engine-playground
 npm ci
 npm run dev
 ```
 
-Open the localhost URL printed by Vite (normally http://127.0.0.1:5173). The server binds only to the local machine. Stop it with Ctrl+C. Dependencies require an internet connection for the first installation.
+Open the localhost URL printed by Vite, normally `http://127.0.0.1:5173`. Stop the server with `Ctrl+C`. Dependency installation requires internet access; the locally served simulator does not require external services. Source links require internet access.
 
-```powershell
-npm run build       # type-check and build dist/
-npm run preview     # locally serve the production build
-npm test            # data and pure simulation tests
-npm run test:e2e    # desktop/mobile browser interaction tests
-npm run security:scan
+## Controls and accessibility
+
+Use **Start engine**, then adjust the throttle. Stop lets the spools coast down; restarting returns the command to idle. Reset clears the run, tour and diagram layer choices. Throttle command is not equal to thrust percentage.
+
+Controls support keyboard navigation with Tab, Enter/Space and slider arrow keys. Stage buttons offer an alternative to selecting the SVG. On smaller screens, scroll the enlarged diagram sideways; its scroll region can also receive keyboard focus. Reduced-motion preferences freeze decorative airflow and rotor motion while the readings remain responsive. Sound is off until you enable it.
+
+## Project structure
+
+```text
+src/
+  data/engines.ts                 Engine definitions, verified facts and sources
+  types.ts                       Engine and diagram types
+  simulation/
+    model.ts                     Pure simulation state transitions
+    useSimulation.ts             Frame clock and reduced-motion support
+    thermal.ts                   Illustrative heat profile and unit conversion
+    sound.ts                     Engine-specific synthesized audio profiles
+    useEngineSound.ts            Web Audio lifecycle and smooth sound changes
+  components/
+    EngineCutaway.tsx            Original interactive SVG rendering
+    ThermalProfile.tsx           Section temperatures and unit switch
+  App.tsx                        Controls, learning, gauges and comparison
+  styles.css                     Responsive layout and visual styling
+tests/                           Model, browser and production-policy tests
+scripts/                         Credential-pattern scan and licence notices
+public/                          Original favicon, notices and host header template
 ```
 
-Browser tests use installed Microsoft Edge. On another platform, remove `launchOptions.channel: 'msedge'` from playwright.config.ts and run `npx playwright install chromium` before testing. Browser tests run a local Vite server when one is not already available. Screenshots are written to test-results/ and ignored by Git.
+Engine data, simulation logic and rendering are kept separate so another researched engine can be added without rebuilding the whole interface.
 
-## Explore
+## Build and checks
 
-Choose Trent XWB (representative XWB-84 on the A350-900) or GEnx-1B (representative -1B70 on the 787-8). Engine changes reset operating state. Start at idle, then increase the throttle; stop to coast down. Pause freezes the model and decoration. Slow motion advances at one quarter speed. Reset clears the run, tour and layer choices. Starting again returns the throttle command to idle.
+```sh
+npm run build
+npm run preview
+npm test
+npm run test:e2e
+npm run security:scan
+npm audit
+```
 
-Click a component or a stage button for explanations. Follow the air starts a manual five-step guided tour; it does not start the engine. All sections work continuously together in operation. On small screens the enlarged cutaway scrolls horizontally; the surrounding page fits the screen. Focus the cutaway region and use arrow keys to scroll. Stage buttons provide a keyboard alternative to clicking the diagram. Native controls support Tab, Enter/Space and range-slider arrows. Reduced-motion preferences freeze rotor/flow animation while gauges remain responsive.
+`npm run build` type-checks the app and generates `dist/`. `npm run preview` serves that production build locally. After building, check its security policy with:
 
-## Structure
+```sh
+npx playwright test --config playwright.production.config.ts
+```
 
-- `src/data/engines.ts`: researched variants, sources, specifications, component/spool topology and learning copy.
-- `src/types.ts`: typed engine schema and layer controls.
-- `src/simulation/model.ts`: pure state transitions and shared illustrative response model.
-- `src/simulation/useSimulation.ts`: animation frame clock and reduced-motion preference handling.
-- `src/components/EngineCutaway.tsx`: original SVG cutaway driven by engine topology.
-- `src/App.tsx`: simulator controls, learning panel, gauges, comparison and sources views.
-- `src/styles.css`: responsive presentation and keyboard focus styles.
-- `tests/`: data/model tests and browser interaction tests.
-- `scripts/`: dependency-notice generation and credential-pattern scanning.
-- `public/_headers`: suggested static-host security headers. These are only effective on hosts that support this file; Vite does not apply it. No deployment has been performed.
+Browser tests use Microsoft Edge. To use Playwright Chromium instead, remove `launchOptions.channel: 'msedge'` from both Playwright configuration files, then run `npx playwright install chromium`. Test screenshots and reports are ignored by Git.
 
-## Research and content origins
+See [VALIDATION.md](VALIDATION.md) for the recorded checks and their limits. Historical local results do not independently verify the current live deployment.
 
-Read SOURCES.md for the engine-specific claim-to-source mapping, THIRD_PARTY_NOTICES.md for dependency licences, and CONTENT_ORIGINS.md for provenance. Runtime licence text is preserved in public/THIRD_PARTY_LICENSES.txt and included in the production build. Run `node scripts/notices.mjs` after dependency changes.
+## Vercel deployment
 
-Only dimensions and stage counts that are supported by the sources are shown in the comparison. They do not determine the schematic scale. Third-party source illustrations are not reproduced.
+The live application is hosted at **https://jet-engine-playground.vercel.app/**.
 
-## Simulation limitations
+| Build setting | Value |
+| --- | --- |
+| Framework | Vite |
+| Root directory | Repository root |
+| Install command | `npm ci` |
+| Build command | `npm run build` |
+| Output directory | `dist` |
+| Environment variables | None required |
 
-All gauges are dimensionless 0–100 teaching indices, not measured percent RPM, degrees, mass flow or force. The model uses exponential responses with different time constants; thrust uses a nonlinear command curve. It is not a thermodynamic solver and has no manufacturer calibration. The same response rules serve both engines, so they cannot rank real-world performance. A zero temperature index means the model's resting state, not zero degrees.
+To update the repository after making changes:
 
-Startup and shutdown are deliberately simplified. Shaft positions, symbol dimensions, flow split and relative animation rates are illustrative. Two rotating marks are motion cues, not blade counts. Actual geometry, cooling flows, bearings, bleed air, accessories, control laws and operating limits are omitted. Bypass and core streams are shown separately. The tour is a teaching sequence, not a startup procedure.
+```sh
+git add .
+git diff --cached
+git commit -m "Describe your changes"
+git push
+```
 
-## Add a third engine
+Review the staged changes before committing. With Vercel's Git integration configured, pushes to the configured production branch trigger deployment. Check the Vercel dashboard for the build result.
 
-1. Research a specific engine variant and its aircraft application using manufacturer or regulator sources. Verify every shaft connection. Add source records with URLs and scope; update SOURCES.md.
-2. Add an `Engine` entry in `src/data/engines.ts`. Give components unique IDs, assign their stage (0–4) and spool, and define each spool's turbine and driven component IDs. Use common LP/IP/HP semantic IDs for the shared model. Gauge names belong to the engine data.
-3. Position symbolic components within the 1100×440 drawing; shafts share y=230. Set shaft endpoints to the relevant component centres and nested radii. Validate both core paths pass through all required components. Do not treat these coordinates as real geometry.
-4. Add only verified specifications with units and source IDs. Extend the comparison row schema if adding a new specification category; the current engines intentionally share the same three categories.
-5. For a geared fan, extra spool type or materially different flow architecture, explicitly extend the schema, renderer and model instead of forcing it into a direct-drive LP/IP/HP arrangement.
-6. Update learning copy and tests. The existing catalogue test intentionally locks the initial scope to two engines; revise it when a third is authorized. Test topology, switching, all controls, mobile layout and reduced motion. Inspect screenshots before delivery.
+The `public/_headers` file is a template for compatible static hosts; do not assume Vercel applies it. Configure equivalent response headers through Vercel's project configuration and verify them on the live URL. This checkout currently has no `vercel.json`; the live header configuration has not been independently checked here.
 
-## Security and hosting
+## Accuracy and simulation limits
 
-No secrets are needed. Do not place keys in VITE_* variables: they are public frontend content. A future keyed integration requires a restricted backend, ignored server-side environment configuration, placeholder-only .env.example, a production secret manager, appropriate authentication and rate/usage limits, least-privilege credentials and redacted logs. Never place credentials in source, browser storage, URLs or client logs.
+**Simplified educational schematic — not to scale.**
 
-Build output consists of compiled assets, the entry HTML, host-header configuration and runtime licences. Source maps are disabled. Only public/ is copied into the build. There is no unsafe HTML injection or untrusted external data ingestion. External links use noreferrer. Suggested CSP permits inline styles for SVG/gauge colours and prohibits external scripts. Configure HTTPS/HSTS at a future HTTPS host; do not enable HSTS blindly for localhost.
+The architecture and separately listed specifications come from public sources. Blade silhouettes, spacing, passage shapes, flow proportions and animation speeds are original approximations. Drawn blades do not represent verified blade counts or exact internal geometry. Cooling circuits, bearings, bleed air, accessories, variable stators and control laws are omitted.
 
-The scanner checks workspace and dist text for common credential patterns and checks tracked files and available Git history when present. It does not print matched secret values. It is a heuristic, not proof of absence. Confirmed exposure requires revocation and rotation, including when a secret has been removed from the current tree.
+The main instruments use dimensionless 0–100 teaching indices, not actual percent RPM, fuel rates or thrust. The shared response model uses smooth lag and a nonlinear throttle-to-thrust curve; it is not a thermodynamic solver and cannot rank the engines' real performance.
 
-See VALIDATION.md for checks actually completed and remaining limitations. This project has not been published or deployed.
+The temperature display uses a deliberately chosen example scale: **20 °C ambient plus 12 °C per heat-index point**. Fahrenheit is converted using `°F = °C × 9/5 + 32` before rounding. These numbers are not manufacturer measurements, operating limits or blade/casing temperatures. The separate exhaust gauge remains a normalized heat index. Startup, shutdown and acoustic profiles are also illustrative.
+
+## Sources, licences and security
+
+- [SOURCES.md](SOURCES.md): engine facts, references and scope limitations.
+- [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md): dependency versions and licence notices.
+- [CONTENT_ORIGINS.md](CONTENT_ORIGINS.md): original code, artwork and audio provenance.
+
+No manufacturer logos, photographs, recordings, CAD or third-party engine models are included. Names are factual identifiers; trademarks remain with their respective owners. A public licence for the original project code has not yet been selected. Regenerate dependency notices after dependency changes with `node scripts/notices.mjs`.
+
+No API keys are required. Never put secrets in frontend code, browser storage or `VITE_*` variables. A future keyed service needs a restricted backend, appropriate access and usage controls, and server-side secret storage.
+
+Production builds disable source maps and embed a Content-Security-Policy. Local production preview also sends protective response headers. Only intended public assets are copied into the build. The development server is configured for localhost and is not a production server.
+
+The credential scanner checks workspace/build text and available Git history for common secret patterns without printing secret values. It is a heuristic, not a guarantee. If a credential is exposed, revoke and rotate it; deleting the file alone is insufficient. Dependency audits and local tests do not guarantee that a website is unhackable.
+
+## Add another engine
+
+1. Research a specific variant, aircraft application and shaft connections using manufacturer or regulator sources. Add references to the data catalogue and SOURCES.md.
+2. Add an `Engine` definition in `src/data/engines.ts`, with unique component IDs, stage assignments (0–4), spool membership and turbine-to-driven-component connections.
+3. Position the schematic components in the 1100×440 view. Shafts share the centreline at y=230. Check that core airflow intersects each required assembly and bypass airflow avoids combustion.
+4. Add verified specifications with units and references. The comparison currently uses three matching specification categories; extend its schema if needed.
+5. Add an explicit audio profile if desired. For geared fans, additional spool types or different flow architectures, extend the schema and renderer instead of forcing a direct-drive LP/IP/HP arrangement.
+6. Update the initial two-engine scope test, learning copy and relevant tests. Verify switching, controls, airflow, mobile layout and reduced motion, and inspect the rendered result.
+
+---
 
 Independent educational project. Not affiliated with or endorsed by aircraft or engine manufacturers. Schematics and simulated readings are simplified and are not intended for flight operations, maintenance, engineering design, or certification.
-
-Optional sound: click Enable sound to hear a quiet engine-specific synthesized soundscape with filtered airflow noise and tones following LP, HP and (for Trent) IP spool response. Pause and shutdown silence it. This is not a recording or an acoustically validated engine model.
-
-Section temperatures: the new gas-path panel shows relative warmth for intake, bypass, compression, combustor exit, turbines and core exhaust. Hover or keyboard-focus a station for its explanation. These are illustrative 0–100 heat indices, not Celsius or metal temperatures. Intake airflow uses curved streamlines and original particle streaks, following the simulation clock and reduced-motion preference.
-
-
-Temperature-unit update: the panel and diagram now share a °C/°F switch. Numerical values use an explicitly illustrative example scale: 20 °C ambient plus 12 °C per heat-index point. This supersedes the earlier relative-only display description; the scale is not manufacturer data or a validated thermal model. The separate exhaust gauge remains a labelled heat index.
-
-Security hardening (21 November 2026): production builds embed a restrictive Content-Security-Policy meta tag. Vite preview also sends CSP, frame protection, MIME-sniffing prevention, referrer and browser-permission headers. The development server intentionally differs for hot reload. A future public host must apply public/_headers or equivalent, use HTTPS and verify response headers. Run npx playwright test --config playwright.production.config.ts after building to check the production policy.
