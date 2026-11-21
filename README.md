@@ -2,19 +2,36 @@
 
 # Jet Engine Playground
 
-### Follow the air. Hear the spools. Explore the engine.
+### An interactive field guide to turbofan engines.
 
 An interactive turbofan learning lab built with **React · TypeScript · Vite · SVG · Web Audio**.
 
-**[Launch the simulator](https://jet-engine-playground.vercel.app/)** &nbsp; · &nbsp; [Quick start](#run-it-yourself) &nbsp; · &nbsp; [Explore the engines](#two-engines-two-architectures) &nbsp; · &nbsp; [Technical guide](docs/GUIDE.md)
+**[Launch the simulator](https://jet-engine-playground.vercel.app/)** &nbsp; · &nbsp; [Gallery](#inside-the-playground) &nbsp; · &nbsp; [How it works](#follow-the-air) &nbsp; · &nbsp; [Response graph](#understand-the-response) &nbsp; · &nbsp; [Quick start](#run-it-yourself) &nbsp; · &nbsp; [Technical guide](docs/GUIDE.md)
 
-**No account · No API keys · Runs in your browser**
+**2 engine architectures · 5 learning stages · Original visuals and synthesized audio**
+
+No account. No API keys. No backend.
 
 [![Jet Engine Playground running the Trent XWB simulator, showing the cutaway, shaft connections and controls](docs/images/simulator-trent.png)](https://jet-engine-playground.vercel.app/)
 
 *Click the screenshot to open the live simulator. Screenshots show the real application; readings are illustrative.*
 
 </div>
+
+## Inside the playground
+
+<table>
+<tr>
+<td width="50%"><strong>Explore every connection</strong><br/>Select a section to isolate its role in the engine.</td>
+<td width="50%"><strong>Compare the architectures</strong><br/>See sourced specifications and mechanical connections.</td>
+</tr>
+<tr>
+<td><a href="docs/images/simulator-genx.png"><img src="docs/images/simulator-genx.png" alt="GEnx cutaway with the turbine section selected and its explanation visible" width="100%"/></a></td>
+<td><a href="docs/images/comparison.png"><img src="docs/images/comparison.png" alt="Side-by-side Trent and GEnx architecture and specification comparison" width="100%"/></a></td>
+</tr>
+</table>
+
+*Select a gallery image to view it at full size. These are screenshots of the working application, not concept mockups.*
 
 ## Take the controls
 
@@ -46,25 +63,79 @@ Open the **[live playground](https://jet-engine-playground.vercel.app/)** and tr
 | **Spools** | Three: LP, IP and HP | Two: LP and HP |
 | **Key connection** | The IP compressor has its own turbine and shaft | The fan and booster share the LP shaft |
 
+## Follow the air
+
+The fan splits the incoming flow into two paths. Only the core stream passes through combustion; the bypass stream travels around it.
+
+```mermaid
+flowchart LR
+    A[Incoming air] --> F[Fan]
+    F --> B[Bypass passage]
+    F --> C[Core compressors]
+    C --> H[Continuous combustion]
+    H --> T[Turbines]
+    T --> E[Core exhaust]
+    B --> X[Bypass exhaust]
+    E --> P[Contribution to thrust]
+    X --> P
+    classDef cool fill:#173c50,stroke:#67ccff,color:#e6f7ff
+    classDef warm fill:#503322,stroke:#ffbf72,color:#fff0df
+    class A,F,B,C,X cool
+    class H,T,E warm
+```
+
+This diagram describes the continuous air path, not a startup sequence. Pressure, cooling flows and exact passage geometry are simplified.
+
 <details>
-<summary><strong>Explore the GEnx cutaway and stage explanations</strong></summary>
+<summary><strong>Trace the shafts: what drives what?</strong></summary>
 
-![GEnx two-spool cutaway with the turbine learning section selected](docs/images/simulator-genx.png)
+Arrows below mean **mechanical power transfer through a shaft**, not airflow. Each spool is a connected rotating assembly; it is not a single blade row.
 
-The LP turbine powers the fan and booster. The HP turbine powers the HP compressor. Matching shaft colours show these mechanical connections.
+```mermaid
+flowchart TB
+    subgraph Trent[Trent XWB-84 · three spools]
+        direction LR
+        TL[LP turbine] -->|LP shaft| TF[Fan]
+        TI[IP turbine] -->|IP shaft| TC[IP compressor]
+        TH[HP turbine] -->|HP shaft| TP[HP compressor]
+    end
+    subgraph GEnx[GEnx-1B70 · two spools]
+        direction LR
+        GL[LP turbine] -->|LP shaft| GF[Fan and booster]
+        GH[HP turbine] -->|HP shaft| GC[HP compressor]
+    end
+    classDef lp fill:#173c50,stroke:#67ccff,color:#e6f7ff
+    classDef ip fill:#332b51,stroke:#a9a0ff,color:#f1edff
+    classDef hp fill:#503322,stroke:#ffbf72,color:#fff0df
+    class TL,TF,GL,GF lp
+    class TI,TC ip
+    class TH,TP,GH,GC hp
+```
 
-[Try it in the simulator](https://jet-engine-playground.vercel.app/)
+[Read the architecture sources](SOURCES.md) · [Explore the live schematic](https://jet-engine-playground.vercel.app/)
 
 </details>
 
+## Understand the response
+
+Raising the throttle changes the command. The simulated spools and thrust take time to respond, and a 50% command does not mean a thrust index of 50.
+
+[![Graph of throttle command versus settled illustrative thrust, showing the nonlinear simulator curve against a straight one-to-one reference](docs/images/throttle-response.svg)](docs/images/throttle-response.svg)
+
+**Generated from the actual simulation code**, sampled at 51 throttle settings after 90 simulated seconds at each setting. It shows the shared teaching model—not measured engine performance. Zero command means running at idle; the off state is separate.
+
 <details>
-<summary><strong>See the side-by-side engine comparison</strong></summary>
+<summary><strong>How the graph is produced</strong></summary>
 
-![Comparison of the Trent XWB-84 and GEnx-1B70, including aircraft, spool connections and sourced specifications](docs/images/comparison.png)
+The generator imports the same state-transition functions used by the app. It starts the engine, applies each command, advances the model, and plots the settled thrust index. The dotted line is only a visual 1:1 reference.
 
-Published specifications are separate from the illustrative simulation. Neither architecture is presented as universally better.
+To regenerate with a Node version that supports TypeScript type stripping (tested with Node 26.13.1):
 
-[Read the factual sources](SOURCES.md)
+```sh
+node scripts/readme-graph.mjs
+```
+
+The response is intentionally shared between engines. This graph cannot establish which real engine produces more thrust or uses less fuel.
 
 </details>
 
